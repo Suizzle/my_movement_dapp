@@ -1,13 +1,13 @@
 import { WalletSelector } from "@aptos-labs/wallet-adapter-ant-design";
 import "@aptos-labs/wallet-adapter-ant-design/dist/index.css";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState } from "react";
 import { useWallet, InputTransactionData } from '@aptos-labs/wallet-adapter-react';
 import { Aptos, AptosConfig, Network } from "@aptos-labs/ts-sdk";
 import { ONCHAIN_BIO } from "./constants";
 import './index.css';
 
 // with custom configuration
-const aptosConfig = new AptosConfig({ network: Network.CUSTOM });
+const aptosConfig = new AptosConfig({ network: Network.CUSTOM, fullnode: "https://aptos.testnet.suzuka.movementlabs.xyz/v1" });
 const aptos = new Aptos(aptosConfig);
 
 function App() {
@@ -20,12 +20,14 @@ function App() {
   const [currentBio, setCurrentBio] = useState(null);
 
   const fetchBio = async () => {
+    console.log("fetching bio...")
     if (!account) {
       console.log("No account")
       return [];
     }
   
     try {
+      console.log("calling get account resources for bio...")
       const bioResource = await aptos.getAccountResource(
         {
           accountAddress:account?.address,
@@ -50,6 +52,7 @@ function App() {
       const onchainName = name.current.value;
       const onchainBio = bio.current.value;
       const transaction: InputTransactionData = {
+        sender: account?.address,
         data: {
           function:`${ONCHAIN_BIO}::onchain_bio::register`,
           functionArguments:[onchainName, onchainBio]
@@ -59,8 +62,8 @@ function App() {
         // sign and submit transaction to chain
         const response = await signAndSubmitTransaction(transaction);
         // wait for transaction
-        console.log(`Success! View your transaction at https://explorer.aptoslabs.com/txn/${response.hash}`)
         await aptos.waitForTransaction({transactionHash:response.hash});
+        console.log(`Success! View your transaction at https://explorer.movementlabs.xyz/txn/${response.hash}?network=testnet`)
         fetchBio();
       } catch (error: any) {
         console.log("Error:", error)
@@ -116,7 +119,7 @@ function App() {
         <div className="row">
           <center>
             <h3>Your Bio:</h3>
-            <p>{currentBio}</p>
+            <p>{accountHasBio ? currentBio : 'no bio yet!'}</p>
           </center>
         </div>
 

@@ -6,4 +6,4 @@ git = 'https://github.com/aptos-labs/aptos-core.git'
 rev = 'main'
 subdir = 'aptos-move/framework/aptos-framework'                                                                                                                                                                                            
 [addresses]
-OnchainBio='0xa8e7c149c80c604a71a785217fb3783b461d34945844d8a8609dc0ef06c70b92'
+OnchainBio='0xf37c248bef5aa27584f29b63a7259f0ee9e1797ede094202ac462ec67cab2daf'
